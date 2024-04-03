@@ -128,9 +128,9 @@ export class MethodRouter {
 
 
 
-    handler() {
+    handler() : MethodCallbacks {
         const self = this;
-        return Object.entries(HttpMethods).reduce((prev, [key, value]) => {
+        const handle = Object.entries(HttpMethods).reduce((prev, [key, value]) => {
             const p: any = { ...prev };
             p[value] = async (req: NextRequest) => {
                 const middlewares = this.middlewares.filter(mid => mid.method == value).map(mid => mid.callback);
@@ -142,7 +142,18 @@ export class MethodRouter {
                     return await this.chainCall(req, middlewares);
             }
             return p;
-        }, {});
+        }, {
+            GET: null,
+            POST: null,
+            PUT: null,
+            DELETE: null,
+            PATCH: null,
+            HEAD: null,
+            CONNECT: null,
+            TRACE: null,
+            OPTIONS: null
+        });
+        return handle;
     }
 }
 
