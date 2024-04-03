@@ -8,8 +8,8 @@ import { HttpMethods, HttpResponse } from 'standard-http-response-js';
 
 
 export declare type NextChainCallback = (value?: any | null) => Promise<NextResponse | undefined | null | any>;
-export declare type RouterCallback = (req: NextRequest, res: NextResponse, next: NextChainCallback, data?: { passdata?: any, chainResult?: any }) => void | NextResponse | Promise<void> | Promise<NextResponse>;
-export declare type FallbackRouterCallback = (req: NextRequest, res: NextResponse, error: any ) => void | NextResponse | Promise<void> |  Promise<NextResponse>;
+export declare type RouterCallback = (req: NextRequest, next: NextChainCallback, data?: { passdata?: any, chainResult?: any }) => void | NextResponse | Promise<void> | Promise<NextResponse>;
+export declare type FallbackRouterCallback = (req: NextRequest, error: any ) => void | NextResponse | Promise<void> |  Promise<NextResponse>;
 export declare type MethodCallbacks = Record<HttpMethods, RouterCallback | null | any>;
 
 
@@ -26,9 +26,9 @@ export class MethodRouter {
         HEAD: null,
         CONNECT: null,
         TRACE: null,
-        OPTIONS: (req: NextRequest, res: NextResponse, next: NextChainCallback) => {
+        OPTIONS: (req: NextRequest, next: NextChainCallback) => {
             next();
-            return res;
+            return NextResponse.next();
         }
     };
 
@@ -98,7 +98,6 @@ export class MethodRouter {
 
     private async chainCall(req: NextRequest, callbacks: RouterCallback[] = []) {
         const callbackLength = callbacks.length;
-        const res = new NextResponse();
         let index: number = -1;
         let passdata: any = {};
         try{
@@ -109,9 +108,9 @@ export class MethodRouter {
                     if(index > callbackLength) return;
                     let r;
                     try{
-                        r = await callbacks[index](req, res, next, { passdata, chainResult });
+                        r = await callbacks[index](req, next, { passdata, chainResult });
                     }catch(error){
-                        r = await this.fallbackCallback?.(req, res, error);
+                        r = await this.fallbackCallback?.(req, error);
                         return reject(r);
                     }
                     if(r instanceof NextResponse) {
