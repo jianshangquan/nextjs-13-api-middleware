@@ -1,10 +1,11 @@
 {
   "name": "nextjs-13-api-middleware",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "homepage": "http://jianshangquan.github.io/boilerplate_ui",
   "scripts": {
-    "build": "rollup -c --bundleConfigAsCjs"
+    "build": "rollup -c --bundleConfigAsCjs",
+    "prepublishOnly": "npm run build"
   },
   "license": "MIT",
   "type": "module",

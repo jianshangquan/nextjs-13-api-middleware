@@ -8,8 +8,8 @@ import { HttpMethods, HttpResponse } from 'standard-http-response-js';
 
 
 export declare type NextChainCallback = (value?: any | null) => Promise<NextResponse | undefined | null | any>;
-export declare type RouterCallback = (req: NextRequest, res: typeof NextResponse, next: NextChainCallback, data?: { passdata?: any, chainResult?: any }) => void | NextResponse;
-export declare type FallbackRouterCallback = (req: NextRequest, res: typeof NextResponse, error: any ) => void | NextResponse;
+export declare type RouterCallback = (req: NextRequest, res: NextResponse, next: NextChainCallback, data?: { passdata?: any, chainResult?: any }) => void | NextResponse;
+export declare type FallbackRouterCallback = (req: NextRequest, res: NextResponse, error: any ) => void | NextResponse;
 export declare type MethodCallbacks = Record<HttpMethods, RouterCallback | null | any>;
 
 
@@ -98,7 +98,7 @@ export class MethodRouter {
 
     private async chainCall(req: NextRequest, callbacks: RouterCallback[] = []) {
         const callbackLength = callbacks.length;
-        const res = NextResponse;
+        const res = new NextResponse();
         let index: number = -1;
         let passdata: any = {};
         try{
