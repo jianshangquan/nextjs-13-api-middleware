@@ -113,8 +113,8 @@ export class MethodRouter {
                         r = await this.fallbackCallback?.(req, error);
                         return reject(r);
                     }
-                    if(r instanceof NextResponse) {
-                        resolve(r);
+                    if(!!r) {
+                        return resolve(r);
                     }
                 }
                 await next({ passdata, chainResult: null });
@@ -135,7 +135,7 @@ export class MethodRouter {
             p[value] = async (req: NextRequest) => {
                 const middlewares = this.middlewares.filter(mid => mid.method == value).map(mid => mid.callback);
                 const cb = self.methodCallbacks[req.method as HttpMethods]
-                console.log(req.method);
+                console.log(`[METHOD ROUTER: ${req.method}]`);
                 if (cb)
                     return await this.chainCall(req, [...middlewares, cb])
                 else 
