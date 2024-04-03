@@ -8,8 +8,8 @@ import { HttpMethods, HttpResponse } from 'standard-http-response-js';
 
 
 export declare type NextChainCallback = (value?: any | null) => Promise<NextResponse | undefined | null | any>;
-export declare type RouterCallback = (req: NextRequest, next: NextChainCallback, data?: { passdata?: any, chainResult?: any }) => void | NextResponse | Promise<void> | Promise<NextResponse>;
-export declare type FallbackRouterCallback = (req: NextRequest, error: any ) => void | NextResponse | Promise<void> |  Promise<NextResponse>;
+export declare type RouterCallback = (req: NextRequest, next: NextChainCallback, data: { passdata?: any, chainResult?: any }) => void | NextResponse | Promise<void> | Promise<NextResponse>;
+export declare type FallbackRouterCallback = (req: NextRequest, error: any, data: { passdata: any, chainResult: any }) => void | NextResponse | Promise<void> |  Promise<NextResponse>;
 export declare type MethodCallbacks = Record<HttpMethods, RouterCallback | null | any>;
 
 
@@ -48,7 +48,7 @@ export class MethodRouter {
     }
 
 
-    fallback(callback: RouterCallback){
+    fallback(callback: FallbackRouterCallback){
         this.fallbackCallback = callback;
     }
 
@@ -102,7 +102,7 @@ export class MethodRouter {
         let passdata: any = {};
         try{
             const response = await new Promise(async (resolve, reject) => {
-                const next = async (chainResult: any | null) => {
+                const next = async (chainResult: any) => {
                     index = index + 1;
                     const i = index;
                     if(index > callbackLength) return;
@@ -110,7 +110,7 @@ export class MethodRouter {
                     try{
                         r = await callbacks[index](req, next, { passdata, chainResult });
                     }catch(error){
-                        r = await this.fallbackCallback?.(req, error);
+                        r = await this.fallbackCallback?.(req, error, { passdata, chainResult });
                         return reject(r);
                     }
                     if(!!r) {
@@ -156,5 +156,3 @@ export class MethodRouter {
         return handle;
     }
 }
-
-
